@@ -3,126 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yachay Verde — Identificador de Plantas Medicinales</title>
-<style>
-  body { font-family: Arial, sans-serif; max-width: 480px; margin: auto; padding: 16px; text-align: center; }
-  h1 { color: #2e7d32; font-size: 1.4em; }
-  #imagen-preview { max-width: 100%; border-radius: 8px; margin: 12px 0; display:none; }
-  button, input[type="file"] { padding: 10px 16px; margin: 6px; border-radius: 8px; border: none; background:#2e7d32; color:white; font-size:1em; }
-  #resultado { margin-top: 16px; padding: 12px; border-radius: 8px; background:#f1f8e9; font-weight:bold; }
-  #ficha { margin-top: 12px; padding: 14px; border-radius: 8px; background:#fff3e0; text-align:left; display:none; line-height:1.5; }
-  #ficha .fuente { font-size:0.8em; color:#555; margin-top:8px; font-style:italic; }
-  #advertencia { font-size:0.85em; color:#b71c1c; margin-top:10px; }
-  #reintento { color:#e65100; font-weight:bold; display:none; }
-</style>
+<meta name="theme-color" content="#386A20">
+<title>Yachay Verde — Guía de Plantas Medicinales</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>🌿 Yachay Verde</h1>
-<p>Toma o sube una foto de la planta para identificarla</p>
+<!-- Top App Bar -->
+<header class="top-app-bar">
+  <span class="material-symbols-outlined logo-icon">eco</span>
+  <h1>Yachay Verde</h1>
+  <button id="btn-instalar" class="icon-button" title="Instalar app" aria-label="Instalar aplicación" hidden>
+    <span class="material-symbols-outlined">install_mobile</span>
+  </button>
+</header>
 
-<input type="file" accept="image/*" capture="environment" id="input-foto">
-<img id="imagen-preview">
-<div id="resultado">Esperando una foto...</div>
-<div id="reintento">⚠️ No estamos seguros. Intenta con una foto con más luz natural y fondo liso.</div>
-<div id="ficha"></div>
-<p id="advertencia">Esta aplicación orienta, pero no reemplaza la consulta con un profesional de salud.</p>
+<!-- Banner de alerta general -->
+<div class="banner-alerta" role="alert">
+  <span class="material-symbols-outlined">medical_information</span>
+  <p>Si tomas medicamentos, estás embarazada o das de lactar, consulta a un profesional de salud antes de usar cualquier planta medicinal.</p>
+</div>
+
+<main>
+
+  <!-- Sección: Identificar -->
+  <section id="tab-identificar" class="tab-panel active">
+    <div class="card upload-card">
+      <span class="material-symbols-outlined upload-icon">photo_camera</span>
+      <p>Toma o sube una foto de la planta para identificarla</p>
+      <label for="input-foto" class="btn-filled">
+        <span class="material-symbols-outlined">add_a_photo</span> Elegir foto
+      </label>
+      <input type="file" accept="image/*" capture="environment" id="input-foto" hidden>
+    </div>
+
+    <img id="imagen-preview" alt="Vista previa de la foto tomada">
+
+    <div id="estado-modelo" class="chip chip-info">
+      <span class="material-symbols-outlined">hourglass_top</span> Cargando modelo...
+    </div>
+
+    <div id="resultado-card" class="card resultado-card" hidden>
+      <div class="resultado-header">
+        <h2 id="resultado-nombre"></h2>
+        <span id="resultado-confianza" class="chip chip-confianza"></span>
+      </div>
+    </div>
+
+    <div id="reintento-card" class="card reintento-card" hidden>
+      <span class="material-symbols-outlined">error</span>
+      <p>No estamos seguros de la especie. Intenta con una foto con más luz natural, fondo liso y la hoja bien enfocada.</p>
+    </div>
+
+    <div id="ficha" class="card ficha-card" hidden></div>
+
+    <!-- Historial -->
+    <div id="historial-section" class="historial-section">
+      <div class="historial-header">
+        <h3>Historial reciente</h3>
+        <button id="btn-borrar-historial" class="btn-text">Borrar</button>
+      </div>
+      <div id="historial-chips" class="historial-chips"></div>
+      <p class="historial-nota">El historial se guarda solo en este dispositivo; no se envía ni almacena ningún dato personal.</p>
+    </div>
+  </section>
+
+  <!-- Sección: Catálogo -->
+  <section id="tab-catalogo" class="tab-panel">
+    <div class="search-bar">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" id="buscador-catalogo" placeholder="Buscar por nombre o uso (ej. insomnio, digestivo)">
+    </div>
+    <div id="lista-catalogo" class="catalogo-lista"></div>
+  </section>
+
+  <!-- Sección: Nosotros -->
+  <section id="tab-nosotros" class="tab-panel">
+    <div class="card">
+      <h2>Sobre Yachay Verde</h2>
+      <p>Yachay Verde es una guía digital que identifica plantas medicinales de la sierra liberteña (muña, valeriana, hercampuri y tara) mediante un modelo de inteligencia artificial entrenado en Teachable Machine, y ofrece información revisada de fuentes científicas y etnobotánicas sobre su uso tradicional seguro.</p>
+      <p>Proyecto elaborado por estudiantes de 3.° "B" de la I.E. Santa Rita de Jesús, Trujillo, La Libertad.</p>
+    </div>
+    <div class="card">
+      <h2>Modo sin conexión</h2>
+      <p>Esta app puede instalarse en tu celular y consultar las fichas de las 4 plantas sin necesidad de internet una vez cargada por primera vez. La identificación por foto sí requiere conexión la primera vez que se usa.</p>
+    </div>
+    <div class="card">
+      <h2>Privacidad</h2>
+      <p>Las fotos que tomas se procesan directamente en tu celular; no se suben ni almacenan en ningún servidor.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-tab="tab-identificar">
+    <span class="material-symbols-outlined">camera</span>
+    <span>Identificar</span>
+  </button>
+  <button class="nav-item" data-tab="tab-catalogo">
+    <span class="material-symbols-outlined">menu_book</span>
+    <span>Catálogo</span>
+  </button>
+  <button class="nav-item" data-tab="tab-nosotros">
+    <span class="material-symbols-outlined">info</span>
+    <span>Nosotros</span>
+  </button>
+</nav>
+
+<div id="snackbar" class="snackbar"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.3/dist/teachablemachine-image.min.js"></script>
-<script>
-const URL_MODELO = "./model/";
-let model;
-const UMBRAL_CONFIANZA = 0.70;
-
-const fichas = {
-  "Hercampuri": {
-    quechua: "Hjircan Pureck (también conocido como harcapura o chavín)",
-    uso: "Se usa tradicionalmente para cuidar el hígado, ayudar a la digestión, como apoyo en personas con diabetes, para eliminar líquidos del cuerpo (diurético) y para ayudar a bajar el colesterol.",
-    parte: "Hojas y planta entera.",
-    dosis: "Cocimiento de 3 a 5 gramos por litro de agua; se toma 1 taza en ayunas.",
-    contraindicacion: "No se recomienda en mujeres gestantes, personas muy delgadas o con tendencia a bajar de azúcar en la sangre.",
-    fuente: "Grupo Técnico Nacional Plantas Medicinales (2006); Cuadros Oriundo y Guevara Pérez (2023)."
-  },
-  "Muña": {
-    quechua: "Muña (el mismo término se usa en quechua y en español)",
-    uso: "Ayuda a la digestión: alivia cólicos, gases, indigestión y molestias estomacales. También se usa de forma complementaria para molestias respiratorias e inflamación de la boca.",
-    parte: "Hojas, flores y tallos.",
-    dosis: "Infusión o decocción, 2 veces al día.",
-    contraindicacion: "Usarla en dosis altas o por tiempo prolongado puede afectar el hígado y los pulmones; no abusar de la cantidad ni del tiempo de uso.",
-    fuente: "Linares Otoya (2020); Muñoz-Guerra et al. (2025); León-Marrou et al. (2023)."
-  },
-  "Tara": {
-    quechua: "Tara (también llamada taya, voz de origen quechua)",
-    uso: "Sus vainas se usan en gárgaras para aliviar la amigdalitis, y sus hojas en infusión para molestias en la boca (estomatitis). También se le reconoce un efecto protector del estómago y el hígado.",
-    parte: "Vainas y hojas.",
-    dosis: "Gárgaras o infusión de las vainas; infusión de las hojas.",
-    contraindicacion: "No se reportaron contraindicaciones específicas en las fuentes revisadas; se recomienda un uso moderado por su alto contenido de taninos.",
-    fuente: "PromPerú (s. f.); Callohuari, Sandoval y Huamán (2017); López, Oré y Miranda (2020)."
-  },
-  "Valeriana": {
-    quechua: "Maych'a",
-    uso: "Calma los nervios y ayuda a conciliar el sueño; se usa tradicionalmente para el insomnio y el nerviosismo.",
-    parte: "Raíz.",
-    dosis: "Hervir 10 gramos de raíz seca en 1 litro de agua durante 5 minutos; tomar 1 taza antes de dormir.",
-    contraindicacion: "Se recomienda no combinarla con sedantes ni alcohol sin consultar antes con un profesional de salud.",
-    fuente: "Ascate-Pasos et al. (2020); Tesis UNC — Medina Tello; estudio Scielo Perú."
-  }
-};
-
-async function cargarModelo() {
-  const modelURL = URL_MODELO + "model.json";
-  const metadataURL = URL_MODELO + "metadata.json";
-  model = await tmImage.load(modelURL, metadataURL);
-  document.getElementById("resultado").innerText = "Modelo listo. Sube una foto.";
-}
-
-async function predecir(imagenElemento) {
-  const prediccion = await model.predict(imagenElemento);
-  prediccion.sort((a, b) => b.probability - a.probability);
-  const mejor = prediccion[0];
-
-  const reintentoDiv = document.getElementById("reintento");
-  const fichaDiv = document.getElementById("ficha");
-  const resultadoDiv = document.getElementById("resultado");
-
-  if (mejor.probability < UMBRAL_CONFIANZA) {
-    resultadoDiv.innerText = "";
-    reintentoDiv.style.display = "block";
-    fichaDiv.style.display = "none";
-    return;
-  }
-
-  reintentoDiv.style.display = "none";
-  resultadoDiv.innerText = `Especie identificada: ${mejor.className} (${(mejor.probability*100).toFixed(1)}% de confianza)`;
-
-  const info = fichas[mejor.className];
-  if (info) {
-    fichaDiv.style.display = "block";
-    fichaDiv.innerHTML = `
-      <strong>Nombre en quechua:</strong> ${info.quechua}<br><br>
-      <strong>¿Para qué se usa?</strong> ${info.uso}<br><br>
-      <strong>Parte que se usa:</strong> ${info.parte}<br><br>
-      <strong>Cómo se prepara:</strong> ${info.dosis}<br><br>
-      <strong>Precauciones:</strong> ${info.contraindicacion}
-      <div class="fuente">Fuente: ${info.fuente}</div>
-    `;
-  } else {
-    fichaDiv.style.display = "none";
-    console.warn("No se encontró ficha para la clase:", mejor.className);
-  }
-}
-
-document.getElementById("input-foto").addEventListener("change", function(e) {
-  const archivo = e.target.files[0];
-  if (!archivo) return;
-  const img = document.getElementById("imagen-preview");
-  img.src = URL.createObjectURL(archivo);
-  img.style.display = "block";
-  img.onload = () => predecir(img);
-});
-
-cargarModelo();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
