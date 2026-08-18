@@ -9,8 +9,9 @@
   h1 { color: #2e7d32; font-size: 1.4em; }
   #imagen-preview { max-width: 100%; border-radius: 8px; margin: 12px 0; display:none; }
   button, input[type="file"] { padding: 10px 16px; margin: 6px; border-radius: 8px; border: none; background:#2e7d32; color:white; font-size:1em; }
-  #resultado { margin-top: 16px; padding: 12px; border-radius: 8px; background:#f1f8e9; }
-  #ficha { margin-top: 12px; padding: 14px; border-radius: 8px; background:#fff3e0; text-align:left; display:none; }
+  #resultado { margin-top: 16px; padding: 12px; border-radius: 8px; background:#f1f8e9; font-weight:bold; }
+  #ficha { margin-top: 12px; padding: 14px; border-radius: 8px; background:#fff3e0; text-align:left; display:none; line-height:1.5; }
+  #ficha .fuente { font-size:0.8em; color:#555; margin-top:8px; font-style:italic; }
   #advertencia { font-size:0.85em; color:#b71c1c; margin-top:10px; }
   #reintento { color:#e65100; font-weight:bold; display:none; }
 </style>
@@ -36,32 +37,36 @@ const UMBRAL_CONFIANZA = 0.70;
 
 const fichas = {
   "Hercampuri": {
-    quechua: "Por confirmar",
-    uso: "Hepático y digestivo; también usado como antidiabético y diurético.",
-    parte: "Hojas.",
-    dosis: "Infusión, 10-15 g por litro de agua hirviendo.",
-    contraindicacion: "No recomendado en gestantes ni personas muy delgadas."
+    quechua: "Hjircan Pureck (también conocido como harcapura o chavín)",
+    uso: "Se usa tradicionalmente para cuidar el hígado, ayudar a la digestión, como apoyo en personas con diabetes, para eliminar líquidos del cuerpo (diurético) y para ayudar a bajar el colesterol.",
+    parte: "Hojas y planta entera.",
+    dosis: "Cocimiento de 3 a 5 gramos por litro de agua; se toma 1 taza en ayunas.",
+    contraindicacion: "No se recomienda en mujeres gestantes, personas muy delgadas o con tendencia a bajar de azúcar en la sangre.",
+    fuente: "Grupo Técnico Nacional Plantas Medicinales (2006); Cuadros Oriundo y Guevara Pérez (2023)."
   },
   "Muña": {
-    quechua: "Muña",
-    uso: "Digestivo: alivia cólicos, gases e indigestión.",
-    parte: "Hojas y tallos.",
+    quechua: "Muña (el mismo término se usa en quechua y en español)",
+    uso: "Ayuda a la digestión: alivia cólicos, gases, indigestión y molestias estomacales. También se usa de forma complementaria para molestias respiratorias e inflamación de la boca.",
+    parte: "Hojas, flores y tallos.",
     dosis: "Infusión o decocción, 2 veces al día.",
-    contraindicacion: "Evitar dosis altas prolongadas por riesgo de toxicidad hepática y pulmonar."
+    contraindicacion: "Usarla en dosis altas o por tiempo prolongado puede afectar el hígado y los pulmones; no abusar de la cantidad ni del tiempo de uso.",
+    fuente: "Linares Otoya (2020); Muñoz-Guerra et al. (2025); León-Marrou et al. (2023)."
   },
   "Tara": {
-    quechua: "Por confirmar",
-    uso: "Antiinflamatorio de garganta y protector gástrico/hepático.",
+    quechua: "Tara (también llamada taya, voz de origen quechua)",
+    uso: "Sus vainas se usan en gárgaras para aliviar la amigdalitis, y sus hojas en infusión para molestias en la boca (estomatitis). También se le reconoce un efecto protector del estómago y el hígado.",
     parte: "Vainas y hojas.",
-    dosis: "Gárgaras de infusión de vainas para amigdalitis; infusión de hojas para estomatitis.",
-    contraindicacion: "No reportada en las fuentes revisadas; usar con moderación."
+    dosis: "Gárgaras o infusión de las vainas; infusión de las hojas.",
+    contraindicacion: "No se reportaron contraindicaciones específicas en las fuentes revisadas; se recomienda un uso moderado por su alto contenido de taninos.",
+    fuente: "PromPerú (s. f.); Callohuari, Sandoval y Huamán (2017); López, Oré y Miranda (2020)."
   },
   "Valeriana": {
-    quechua: "Por confirmar",
-    uso: "Sedante y ansiolítico, ayuda con el insomnio.",
+    quechua: "Maych'a",
+    uso: "Calma los nervios y ayuda a conciliar el sueño; se usa tradicionalmente para el insomnio y el nerviosismo.",
     parte: "Raíz.",
-    dosis: "10 g de raíz seca por litro de agua, cocción 5 min, 1 taza antes de dormir.",
-    contraindicacion: "Evitar combinar con sedantes o alcohol sin supervisión médica."
+    dosis: "Hervir 10 gramos de raíz seca en 1 litro de agua durante 5 minutos; tomar 1 taza antes de dormir.",
+    contraindicacion: "Se recomienda no combinarla con sedantes ni alcohol sin consultar antes con un profesional de salud.",
+    fuente: "Ascate-Pasos et al. (2020); Tesis UNC — Medina Tello; estudio Scielo Perú."
   }
 };
 
@@ -95,11 +100,12 @@ async function predecir(imagenElemento) {
   if (info) {
     fichaDiv.style.display = "block";
     fichaDiv.innerHTML = `
-      <strong>Nombre en quechua:</strong> ${info.quechua}<br>
-      <strong>Uso tradicional:</strong> ${info.uso}<br>
-      <strong>Parte empleada:</strong> ${info.parte}<br>
-      <strong>Dosis referencial:</strong> ${info.dosis}<br>
-      <strong>Contraindicaciones:</strong> ${info.contraindicacion}
+      <strong>Nombre en quechua:</strong> ${info.quechua}<br><br>
+      <strong>¿Para qué se usa?</strong> ${info.uso}<br><br>
+      <strong>Parte que se usa:</strong> ${info.parte}<br><br>
+      <strong>Cómo se prepara:</strong> ${info.dosis}<br><br>
+      <strong>Precauciones:</strong> ${info.contraindicacion}
+      <div class="fuente">Fuente: ${info.fuente}</div>
     `;
   } else {
     fichaDiv.style.display = "none";
