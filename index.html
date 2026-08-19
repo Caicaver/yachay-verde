@@ -24,6 +24,7 @@
     <img src="icons/icon-192.png" alt="Logo Yachay Verde" class="logo-icon-img">
     <h1>Yachay Verde</h1>
   </button>
+  <span id="badge-pro" class="badge-pro" hidden>PRO</span>
   <button id="btn-tema" class="icon-button" aria-label="Cambiar tema claro/oscuro">
     <span class="material-symbols-outlined">dark_mode</span>
   </button>
@@ -40,9 +41,6 @@
     <strong>Yachay Verde</strong>
   </div>
 
-  <span class="drawer-grupo-titulo">Principal</span>
-  <button class="drawer-item" data-accion="inicio"><span class="material-symbols-outlined">home</span> Inicio</button>
-
   <span class="drawer-grupo-titulo">Información</span>
   <button class="drawer-item" data-panel="panel-fuentes"><span class="material-symbols-outlined">verified</span> Información y fuentes</button>
 
@@ -57,16 +55,56 @@
   <button class="drawer-item" data-panel="panel-nosotros"><span class="material-symbols-outlined">groups</span> Nosotros</button>
 </nav>
 
-<!-- Banner de alerta general -->
-<div class="banner-alerta" role="alert">
-  <span class="material-symbols-outlined">medical_information</span>
-  <p>Si tomas medicamentos, estás embarazada o das de lactar, consulta a un profesional de salud antes de usar cualquier planta medicinal.</p>
-</div>
-
 <main>
 
+  <!-- ===== TAB: Inicio (landing atractiva) ===== -->
+  <section id="tab-inicio" class="tab-panel active">
+    <div class="hero-card">
+      <img src="assets/logo-completo.png" alt="Yachay Verde" class="hero-imagen-fondo">
+      <div class="hero-overlay">
+        <span class="material-symbols-outlined hero-icono">eco</span>
+        <h2>Descubre el saber ancestral de la sierra liberteña</h2>
+        <p>Identifica plantas medicinales con inteligencia artificial y accede a información validada científicamente.</p>
+      </div>
+    </div>
+
+    <div class="acciones-principales">
+      <button class="btn-accion-principal" data-tab="tab-identificar">
+        <span class="material-symbols-outlined">photo_camera</span>
+        <span>Identificar planta</span>
+      </button>
+      <button class="btn-accion-principal secundario" data-tab="tab-catalogo">
+        <span class="material-symbols-outlined">menu_book</span>
+        <span>Ver catálogo</span>
+      </button>
+    </div>
+
+    <div class="stats-fila">
+      <div class="stat-item"><strong>4</strong><span>Plantas validadas</span></div>
+      <div class="stat-item"><strong>11</strong><span>Fuentes científicas</span></div>
+      <div class="stat-item"><strong>3</strong><span>Zonas de estudio</span></div>
+    </div>
+
+    <div id="tarjeta-upsell" class="card upsell-card" hidden>
+      <span class="material-symbols-outlined">workspace_premium</span>
+      <div>
+        <h3>Yachay Verde Pro</h3>
+        <p>Fichas clínicas ampliadas, asistente sin límite de preguntas y acceso anticipado a nuevas especies.</p>
+        <button class="btn-tonal-lg" data-panel="panel-especialistas">Conocer más</button>
+      </div>
+    </div>
+
+    <div class="seccion-titulo">Actividad reciente</div>
+    <div id="historial-chips-inicio" class="historial-chips"></div>
+  </section>
+
   <!-- ===== TAB: Identificar ===== -->
-  <section id="tab-identificar" class="tab-panel active">
+  <section id="tab-identificar" class="tab-panel">
+    <div class="banner-alerta" role="alert">
+      <span class="material-symbols-outlined">medical_information</span>
+      <p>Si tomas medicamentos, estás embarazada o das de lactar, consulta a un profesional de salud antes de usar cualquier planta medicinal.</p>
+    </div>
+
     <div class="card upload-card">
       <span class="material-symbols-outlined upload-icon">photo_camera</span>
       <p>Toma o sube una foto de la planta para identificarla</p>
@@ -133,6 +171,10 @@
       <input type="text" id="buscador-catalogo" placeholder="Buscar por nombre o uso (ej. insomnio, digestivo)">
     </div>
     <div id="lista-catalogo" class="catalogo-lista"></div>
+    <div class="card upsell-card-mini">
+      <span class="material-symbols-outlined">new_releases</span>
+      <p>Los usuarios <strong>Pro</strong> reciben acceso anticipado a nuevas especies en cuanto se validan.</p>
+    </div>
   </section>
 
   <!-- ===== TAB: Asistente (Gemini) ===== -->
@@ -141,6 +183,7 @@
       <span class="material-symbols-outlined">smart_toy</span>
       <p>Este asistente solo responde dudas sobre las plantas de Yachay Verde y el proyecto. No sustituye a un profesional de salud.</p>
     </div>
+    <div id="chat-cuota" class="chip chip-info"></div>
     <div id="chat-mensajes" class="chat-mensajes"></div>
     <div class="chat-input-bar">
       <input type="text" id="chat-input" placeholder="Escribe tu pregunta sobre las plantas...">
@@ -160,7 +203,11 @@
 
 <!-- Bottom Navigation -->
 <nav class="bottom-nav">
-  <button class="nav-item active" data-tab="tab-identificar">
+  <button class="nav-item active" data-tab="tab-inicio">
+    <span class="material-symbols-outlined">home</span>
+    <span>Inicio</span>
+  </button>
+  <button class="nav-item" data-tab="tab-identificar">
     <span class="material-symbols-outlined">camera</span>
     <span>Identificar</span>
   </button>
@@ -232,31 +279,55 @@
   </div>
 </div>
 
-<!-- ===== Panel: Especialistas de salud ===== -->
+<!-- ===== Panel: Especialistas de salud (comparativa Gratuito/Pro) ===== -->
 <div id="panel-especialistas" class="modal panel-lateral" hidden>
   <div class="panel-header">
     <h2>Especialistas de salud</h2>
     <button class="btn-cerrar-panel"><span class="material-symbols-outlined">close</span></button>
   </div>
   <div class="panel-body">
-    <div id="especialista-bloqueado" class="card">
-      <span class="material-symbols-outlined" style="font-size:36px;color:var(--md-primary)">lock</span>
-      <h3>Acceso para profesionales</h3>
-      <p>Esta sección demostrativa está pensada para postas de salud y personal médico aliado al proyecto, con funciones ampliadas.</p>
-      <input type="text" id="input-codigo-acceso" placeholder="Código de acceso" class="input-texto">
-      <button id="btn-validar-codigo" class="btn-filled">Ingresar</button>
-      <p class="nota-demo">Demo: código de muestra <code>YACHAY-SALUD-2026</code></p>
+    <div id="especialista-bloqueado">
+      <div class="card comparativa-card">
+        <h3>Gratuito</h3>
+        <ul class="lista-comparativa">
+          <li><span class="material-symbols-outlined ok">check</span> Identificación de 4 plantas por foto</li>
+          <li><span class="material-symbols-outlined ok">check</span> Fichas básicas con fuentes</li>
+          <li><span class="material-symbols-outlined ok">check</span> Asistente: 5 preguntas por día</li>
+          <li><span class="material-symbols-outlined no">close</span> Ficha clínica ampliada</li>
+          <li><span class="material-symbols-outlined no">close</span> Estadísticas de uso por zona</li>
+        </ul>
+      </div>
+      <div class="card comparativa-card destacada">
+        <span class="etiqueta-recomendado">Recomendado para postas de salud</span>
+        <h3>Pro</h3>
+        <ul class="lista-comparativa">
+          <li><span class="material-symbols-outlined ok">check</span> Todo lo del plan Gratuito</li>
+          <li><span class="material-symbols-outlined ok">check</span> Ficha clínica ampliada (compuestos, referencias completas)</li>
+          <li><span class="material-symbols-outlined ok">check</span> Asistente sin límite de preguntas</li>
+          <li><span class="material-symbols-outlined ok">check</span> Panel de estadísticas anónimas de uso</li>
+          <li><span class="material-symbols-outlined ok">check</span> Acceso anticipado a nuevas especies</li>
+          <li><span class="material-symbols-outlined ok">check</span> Pedido preferente de guías impresas al por mayor</li>
+        </ul>
+        <p class="nota-demo">Propuesta: suscripción anual simbólica (ej. S/ 15) que financia la impresión de guías bilingües, alineada al modelo de costos del informe del proyecto.</p>
+      </div>
+      <div class="card">
+        <span class="material-symbols-outlined" style="font-size:32px;color:var(--md-primary)">lock</span>
+        <h3>¿Ya tienes un código?</h3>
+        <input type="text" id="input-codigo-acceso" placeholder="Código de acceso" class="input-texto">
+        <button id="btn-validar-codigo" class="btn-filled">Ingresar</button>
+        <p class="nota-demo">Demo: código de muestra <code>YACHAY-SALUD-2026</code></p>
+      </div>
     </div>
     <div id="especialista-desbloqueado" class="card" hidden>
-      <h3>Panel profesional (demo)</h3>
-      <p>Bienvenido/a. Estas son las funciones "Pro" propuestas para este perfil, alineadas al modelo de sostenibilidad del proyecto:</p>
+      <h3>Panel profesional (demo) <span class="badge-pro">PRO</span></h3>
+      <p>Bienvenido/a. Ya tienes acceso a las funciones ampliadas:</p>
       <ul>
         <li><span class="material-symbols-outlined">science</span> Ficha clínica ampliada con compuestos bioactivos y referencias completas por planta.</li>
         <li><span class="material-symbols-outlined">bar_chart</span> Panel de estadísticas anónimas de uso de la app en su zona.</li>
         <li><span class="material-symbols-outlined">handshake</span> Directorio de contacto para articular alianzas con instituciones educativas.</li>
         <li><span class="material-symbols-outlined">local_shipping</span> Pedido anticipado de guías impresas al por mayor para su posta de salud.</li>
       </ul>
-      <p class="nota-demo">Propuesta de sostenibilidad: acceso profesional mediante una suscripción anual simbólica (ej. S/ 15) que financia la impresión de guías bilingües, en línea con el modelo de costos ya definido en el informe del proyecto.</p>
+      <button id="btn-cerrar-sesion-pro" class="btn-text">Cerrar sesión Pro</button>
     </div>
   </div>
 </div>
@@ -324,7 +395,6 @@
     <button class="btn-cerrar-panel"><span class="material-symbols-outlined">close</span></button>
   </div>
   <div class="panel-body">
-    <img src="assets/logo-completo.png" alt="Yachay Verde" class="hero-imagen">
     <div class="card">
       <h3>Sobre Yachay Verde</h3>
       <p>Yachay Verde es una guía digital que identifica plantas medicinales de la sierra liberteña (muña, valeriana, hercampuri y tara) mediante un modelo de inteligencia artificial entrenado en Teachable Machine, con información revisada de fuentes científicas y etnobotánicas.</p>

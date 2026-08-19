@@ -2,6 +2,8 @@
 const URL_MODELO = "./model/";
 const UMBRAL_CONFIANZA = 0.70;
 const PROXY_URL_GEMINI = "https://yachay-verde-proxy.caicaver94.workers.dev";
+const LIMITE_CHAT_GRATUITO = 5;
+const CODIGO_DEMO = "YACHAY-SALUD-2026";
 
 let model;
 
@@ -31,7 +33,7 @@ const fichas = {
     dosis: "Gárgaras o infusión de las vainas; infusión de las hojas.",
     contraindicacion: "No se reportaron contraindicaciones específicas en las fuentes revisadas; se recomienda un uso moderado por su alto contenido de taninos.",
     combinaciones: "Principio general (no específico de esta planta): los taninos, presentes en la tara, pueden reducir la absorción de suplementos de hierro; se sugiere no tomarlos juntos.",
-    fuente: "PromPerú (s. f.); Callohuari, Sandoval y Huamán (2017); López, Oré y Miranda (2020)."
+    fuente: "PromPerú (s. f.); Callohuari, Sandoval y Miranda (2020)."
   },
   "Valeriana": {
     quechua: "Maych'a",
@@ -52,7 +54,7 @@ const otrasPlantas = {
     dosis: "Infusión de hojas para uso interno; hojas machacadas para uso externo.",
     contraindicacion: "No reportada en la fuente consultada.",
     combinaciones: "No evaluado en este proyecto.",
-    fuente: "MINSA (2025), información general de difusión pública. Nota: esta planta no forma parte de la investigación validada de Yachay Verde ni es identificable por la cámara de esta app."
+    fuente: "MINSA (2025), información general de difusión pública. No forma parte de la investigación validada de Yachay Verde ni es identificable por la cámara."
   },
   "Eucalipto": {
     quechua: "No documentado en fuentes consultadas para este proyecto.",
@@ -61,16 +63,35 @@ const otrasPlantas = {
     dosis: "Inhalación de vapor de la infusión de hojas.",
     contraindicacion: "No reportada en la fuente consultada.",
     combinaciones: "No evaluado en este proyecto.",
-    fuente: "PromPerú / Peru.info, información general de difusión pública. Nota: esta planta no forma parte de la investigación validada de Yachay Verde ni es identificable por la cámara de esta app."
+    fuente: "PromPerú / Peru.info, información general de difusión pública. No forma parte de la investigación validada de Yachay Verde ni es identificable por la cámara."
   }
 };
+
+/* ===================== NIVEL DE USUARIO (Gratuito / Pro) ===================== */
+function esPro() { return localStorage.getItem("yv_nivel") === "pro"; }
+function activarPro() {
+  localStorage.setItem("yv_nivel", "pro");
+  actualizarUIPorNivel();
+}
+function desactivarPro() {
+  localStorage.removeItem("yv_nivel");
+  actualizarUIPorNivel();
+}
+function actualizarUIPorNivel() {
+  const pro = esPro();
+  document.getElementById("badge-pro").hidden = !pro;
+  document.getElementById("tarjeta-upsell").hidden = pro;
+  document.querySelectorAll(".upsell-card-mini").forEach(el => el.hidden = pro);
+  actualizarContadorChat();
+}
 
 /* ===================== NAVEGACIÓN PRINCIPAL ===================== */
 function irATab(idTab) {
   document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.tab === idTab));
   document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === idTab));
+  window.scrollTo({ top: 0, behavior: "instant" });
 }
-document.querySelectorAll(".nav-item").forEach(btn => {
+document.querySelectorAll(".nav-item, .btn-accion-principal").forEach(btn => {
   btn.addEventListener("click", () => irATab(btn.dataset.tab));
 });
 
@@ -78,32 +99,22 @@ document.querySelectorAll(".nav-item").forEach(btn => {
 const drawer = document.getElementById("drawer");
 const overlay = document.getElementById("overlay");
 
-function abrirDrawer() {
-  drawer.classList.add("open");
-  overlay.classList.add("show");
-}
-function cerrarTodo() {
-  drawer.classList.remove("open");
-  overlay.classList.remove("show");
-}
+function abrirDrawer() { drawer.classList.add("open"); overlay.classList.add("show"); }
+function cerrarTodo() { drawer.classList.remove("open"); overlay.classList.remove("show"); }
 function irAInicio() {
   cerrarTodo();
   document.querySelectorAll(".modal.panel-lateral").forEach(p => p.hidden = true);
-  irATab("tab-identificar");
+  irATab("tab-inicio");
 }
 
 document.getElementById("btn-menu").addEventListener("click", abrirDrawer);
 document.getElementById("btn-logo-inicio").addEventListener("click", irAInicio);
 overlay.addEventListener("click", cerrarTodo);
 
-document.querySelectorAll(".drawer-item").forEach(item => {
+document.querySelectorAll("[data-panel]").forEach(item => {
   item.addEventListener("click", () => {
     cerrarTodo();
-    if (item.dataset.accion === "inicio") {
-      irAInicio();
-    } else if (item.dataset.panel) {
-      document.getElementById(item.dataset.panel).hidden = false;
-    }
+    document.getElementById(item.dataset.panel).hidden = false;
   });
 });
 document.querySelectorAll(".btn-cerrar-panel").forEach(btn => {
@@ -125,9 +136,7 @@ function aplicarTema(oscuro) {
   document.getElementById("btn-tema").querySelector(".material-symbols-outlined").textContent = oscuro ? "light_mode" : "dark_mode";
   localStorage.setItem("yv_tema", oscuro ? "oscuro" : "claro");
 }
-document.getElementById("btn-tema").addEventListener("click", () => {
-  aplicarTema(!document.documentElement.classList.contains("dark"));
-});
+document.getElementById("btn-tema").addEventListener("click", () => aplicarTema(!document.documentElement.classList.contains("dark")));
 document.getElementById("switch-tema").addEventListener("change", e => aplicarTema(e.target.checked));
 aplicarTema(localStorage.getItem("yv_tema") === "oscuro");
 
@@ -138,22 +147,13 @@ function aplicarFuente(escala) {
 }
 let escalaFuente = parseFloat(localStorage.getItem("yv_fuente") || "1");
 aplicarFuente(escalaFuente);
-document.getElementById("btn-fuente-mas").addEventListener("click", () => {
-  escalaFuente = Math.min(1.3, escalaFuente + 0.1);
-  aplicarFuente(escalaFuente);
-});
-document.getElementById("btn-fuente-menos").addEventListener("click", () => {
-  escalaFuente = Math.max(0.85, escalaFuente - 0.1);
-  aplicarFuente(escalaFuente);
-});
+document.getElementById("btn-fuente-mas").addEventListener("click", () => { escalaFuente = Math.min(1.3, escalaFuente + 0.1); aplicarFuente(escalaFuente); });
+document.getElementById("btn-fuente-menos").addEventListener("click", () => { escalaFuente = Math.max(0.85, escalaFuente - 0.1); aplicarFuente(escalaFuente); });
 
-/* ===================== ACORDEONES GENÉRICOS (fuentes y catálogo) ===================== */
-function activarAcordeon(contenedor) {
-  contenedor.querySelectorAll(".catalogo-item-header").forEach(header => {
-    header.addEventListener("click", () => header.closest(".catalogo-item").classList.toggle("open"));
-  });
-}
-activarAcordeon(document.getElementById("panel-fuentes"));
+/* ===================== ACORDEONES ===================== */
+document.querySelectorAll("#panel-fuentes .catalogo-item-header").forEach(header => {
+  header.addEventListener("click", () => header.closest(".catalogo-item").classList.toggle("open"));
+});
 
 /* ===================== CARGAR MODELO ===================== */
 async function cargarModelo() {
@@ -169,6 +169,11 @@ async function cargarModelo() {
 
 /* ===================== FICHA HTML ===================== */
 function construirFichaHTML(nombre, info) {
+  const teaserPro = esPro() ? "" : `
+    <div class="ficha-teaser-pro" data-panel="panel-especialistas">
+      <span class="material-symbols-outlined">lock</span>
+      <span>Los usuarios Pro ven aquí la ficha clínica ampliada con compuestos bioactivos.</span>
+    </div>`;
   return `
     <h3>${nombre}</h3>
     <div class="ficha-section"><strong>Nombre en quechua</strong>${info.quechua}</div>
@@ -181,11 +186,13 @@ function construirFichaHTML(nombre, info) {
       <button class="btn-tonal btn-escuchar" data-planta="${nombre}"><span class="material-symbols-outlined">volume_up</span> Escuchar</button>
       <button class="btn-tonal btn-compartir" data-planta="${nombre}"><span class="material-symbols-outlined">share</span> Compartir</button>
     </div>
+    ${teaserPro}
     <div class="ficha-fuente">Fuente: ${info.fuente}</div>
   `;
 }
 
 /* ===================== PREDICCIÓN ===================== */
+let timeoutReintento;
 async function predecir(imagenElemento) {
   if (!model) { mostrarSnackbar("El modelo aún no está listo."); return; }
   const prediccion = await model.predict(imagenElemento);
@@ -195,11 +202,13 @@ async function predecir(imagenElemento) {
   const reintentoCard = document.getElementById("reintento-card");
   const resultadoCard = document.getElementById("resultado-card");
   const fichaDiv = document.getElementById("ficha");
+  clearTimeout(timeoutReintento);
 
   if (mejor.probability < UMBRAL_CONFIANZA) {
     reintentoCard.hidden = false;
     resultadoCard.hidden = true;
     fichaDiv.hidden = true;
+    timeoutReintento = setTimeout(() => { reintentoCard.hidden = true; }, 6000);
     return;
   }
 
@@ -211,16 +220,14 @@ async function predecir(imagenElemento) {
 
   const otrasDiv = document.getElementById("otras-posibilidades");
   const alternativas = prediccion.slice(1).filter(p => p.probability > 0.05);
-  if (alternativas.length > 0) {
-    otrasDiv.innerHTML = "<strong>Otras posibilidades:</strong>" + alternativas.map(p => `
+  otrasDiv.innerHTML = alternativas.length > 0
+    ? "<strong>Otras posibilidades:</strong>" + alternativas.map(p => `
       <div class="otra-posibilidad-item">
         <span>${p.className}</span>
         <div class="barra-prob"><div class="barra-prob-fill" style="width:${(p.probability*100).toFixed(0)}%"></div></div>
         <span>${(p.probability*100).toFixed(0)}%</span>
-      </div>`).join("");
-  } else {
-    otrasDiv.innerHTML = "";
-  }
+      </div>`).join("")
+    : "";
 
   const info = fichas[mejor.className];
   if (info) {
@@ -250,15 +257,10 @@ document.getElementById("btn-abrir-camara").addEventListener("click", async () =
     videoCamara.srcObject = streamActual;
     trackActual = streamActual.getVideoTracks()[0];
     modalCamara.hidden = false;
-
     const capacidades = trackActual.getCapabilities ? trackActual.getCapabilities() : {};
     const btnFlash = document.getElementById("btn-flash");
-    if (capacidades.torch) {
-      btnFlash.hidden = false;
-      btnFlash.dataset.activo = "false";
-    } else {
-      btnFlash.hidden = true;
-    }
+    if (capacidades.torch) { btnFlash.hidden = false; btnFlash.dataset.activo = "false"; }
+    else { btnFlash.hidden = true; }
   } catch (err) {
     mostrarSnackbar("No se pudo acceder a la cámara. Revisa los permisos.");
   }
@@ -271,9 +273,7 @@ document.getElementById("btn-flash").addEventListener("click", async e => {
     await trackActual.applyConstraints({ advanced: [{ torch: !activo }] });
     btn.dataset.activo = String(!activo);
     btn.querySelector(".material-symbols-outlined").textContent = !activo ? "flash_on" : "flash_off";
-  } catch {
-    mostrarSnackbar("El flash no es compatible con este navegador.");
-  }
+  } catch { mostrarSnackbar("El flash no es compatible con este navegador."); }
 });
 
 document.getElementById("btn-capturar").addEventListener("click", () => {
@@ -287,7 +287,6 @@ document.getElementById("btn-capturar").addEventListener("click", () => {
   img.onload = () => predecir(img);
   cerrarCamara();
 });
-
 document.getElementById("btn-cerrar-camara").addEventListener("click", cerrarCamara);
 function cerrarCamara() {
   if (streamActual) streamActual.getTracks().forEach(t => t.stop());
@@ -302,19 +301,21 @@ function guardarEnHistorial(especie, confianza) {
   renderHistorial();
 }
 function renderHistorial() {
-  const cont = document.getElementById("historial-chips");
   const historial = JSON.parse(localStorage.getItem("yv_historial") || "[]");
-  cont.innerHTML = "";
-  if (historial.length === 0) {
-    cont.innerHTML = '<span class="historial-nota">Aún no has identificado ninguna planta.</span>';
-    return;
-  }
-  historial.forEach(item => {
-    const chip = document.createElement("button");
-    chip.className = "historial-chip";
-    chip.textContent = `${item.especie} · ${item.confianza}% · ${item.fecha}`;
-    chip.addEventListener("click", () => mostrarFichaDesdeHistorial(item.especie));
-    cont.appendChild(chip);
+  [document.getElementById("historial-chips"), document.getElementById("historial-chips-inicio")].forEach(cont => {
+    if (!cont) return;
+    cont.innerHTML = "";
+    if (historial.length === 0) {
+      cont.innerHTML = '<span class="historial-nota">Aún no has identificado ninguna planta.</span>';
+      return;
+    }
+    historial.slice(0, 5).forEach(item => {
+      const chip = document.createElement("button");
+      chip.className = "historial-chip";
+      chip.textContent = `${item.especie} · ${item.confianza}% · ${item.fecha}`;
+      chip.addEventListener("click", () => { irATab("tab-identificar"); mostrarFichaDesdeHistorial(item.especie); });
+      cont.appendChild(chip);
+    });
   });
 }
 function mostrarFichaDesdeHistorial(nombre) {
@@ -352,7 +353,6 @@ function renderCatalogo(filtro = "") {
   Object.entries(fuenteDatos).forEach(([nombre, info]) => {
     const textoCompleto = (nombre + " " + info.uso + " " + info.quechua).toLowerCase();
     if (filtro && !textoCompleto.includes(filtroLower)) return;
-
     const item = document.createElement("div");
     item.className = "catalogo-item";
     item.innerHTML = `
@@ -366,13 +366,11 @@ function renderCatalogo(filtro = "") {
     cont.appendChild(item);
   });
 
-  if (cont.innerHTML === "") {
-    cont.innerHTML = '<p class="historial-nota">No se encontraron resultados para tu búsqueda.</p>';
-  }
+  if (cont.innerHTML === "") cont.innerHTML = '<p class="historial-nota">No se encontraron resultados para tu búsqueda.</p>';
 }
 document.getElementById("buscador-catalogo").addEventListener("input", e => renderCatalogo(e.target.value));
 
-/* ===================== ESCUCHAR Y COMPARTIR ===================== */
+/* ===================== ESCUCHAR, COMPARTIR Y TEASER PRO (delegación) ===================== */
 document.addEventListener("click", e => {
   if (e.target.closest(".btn-escuchar")) {
     const nombre = e.target.closest(".btn-escuchar").dataset.planta;
@@ -385,42 +383,51 @@ document.addEventListener("click", e => {
       speechSynthesis.cancel();
       speechSynthesis.speak(utter);
       mostrarSnackbar("Reproduciendo en español (pronunciación quechua aproximada)");
-    } else {
-      mostrarSnackbar("Tu navegador no soporta audio de texto a voz.");
-    }
+    } else { mostrarSnackbar("Tu navegador no soporta audio de texto a voz."); }
   }
 
   if (e.target.closest(".btn-compartir")) {
     const nombre = e.target.closest(".btn-compartir").dataset.planta;
     const info = fichas[nombre] || otrasPlantas[nombre];
     const texto = `${nombre} (${info.quechua}) — ${info.uso} Fuente: ${info.fuente}`;
-    if (navigator.share) {
-      navigator.share({ title: `Yachay Verde: ${nombre}`, text: texto });
-    } else {
-      navigator.clipboard.writeText(texto);
-      mostrarSnackbar("Información copiada al portapapeles");
-    }
+    if (navigator.share) navigator.share({ title: `Yachay Verde: ${nombre}`, text: texto });
+    else { navigator.clipboard.writeText(texto); mostrarSnackbar("Información copiada al portapapeles"); }
+  }
+
+  const teaser = e.target.closest(".ficha-teaser-pro");
+  if (teaser) {
+    document.getElementById(teaser.dataset.panel).hidden = false;
   }
 });
 
-/* ===================== ESPECIALISTAS (código demo) ===================== */
-const CODIGO_DEMO = "YACHAY-SALUD-2026";
+/* ===================== ESPECIALISTAS / PRO ===================== */
 document.getElementById("btn-validar-codigo").addEventListener("click", () => {
   const valor = document.getElementById("input-codigo-acceso").value.trim().toUpperCase();
   if (valor === CODIGO_DEMO) {
     document.getElementById("especialista-bloqueado").hidden = true;
     document.getElementById("especialista-desbloqueado").hidden = false;
+    activarPro();
+    mostrarSnackbar("¡Bienvenido al plan Pro!");
   } else {
     mostrarSnackbar("Código incorrecto. Verifica con el equipo del proyecto.");
   }
 });
+document.getElementById("btn-cerrar-sesion-pro").addEventListener("click", () => {
+  document.getElementById("especialista-bloqueado").hidden = false;
+  document.getElementById("especialista-desbloqueado").hidden = true;
+  desactivarPro();
+  mostrarSnackbar("Sesión Pro cerrada");
+});
+(function restaurarSesionPro() {
+  if (esPro()) {
+    document.getElementById("especialista-bloqueado").hidden = true;
+    document.getElementById("especialista-desbloqueado").hidden = false;
+  }
+})();
 
-/* ===================== MI PERFIL (registro local) ===================== */
+/* ===================== MI PERFIL ===================== */
 document.getElementById("btn-guardar-perfil").addEventListener("click", () => {
-  const perfil = {
-    tipo: document.getElementById("perfil-tipo").value,
-    zona: document.getElementById("perfil-zona").value
-  };
+  const perfil = { tipo: document.getElementById("perfil-tipo").value, zona: document.getElementById("perfil-zona").value };
   localStorage.setItem("yv_perfil", JSON.stringify(perfil));
   document.getElementById("perfil-guardado-nota").hidden = false;
   mostrarSnackbar("Perfil guardado en este dispositivo");
@@ -433,7 +440,33 @@ document.getElementById("btn-guardar-perfil").addEventListener("click", () => {
   }
 })();
 
-/* ===================== ASISTENTE GEMINI (vía proxy seguro) ===================== */
+/* ===================== ASISTENTE GEMINI (con cuota Gratuito/Pro) ===================== */
+function obtenerUsoChatHoy() {
+  const hoy = new Date().toLocaleDateString("es-PE");
+  const registro = JSON.parse(localStorage.getItem("yv_chat_uso") || "{}");
+  return registro.fecha === hoy ? registro.cantidad : 0;
+}
+function incrementarUsoChatHoy() {
+  const hoy = new Date().toLocaleDateString("es-PE");
+  const registro = JSON.parse(localStorage.getItem("yv_chat_uso") || "{}");
+  const cantidad = registro.fecha === hoy ? registro.cantidad + 1 : 1;
+  localStorage.setItem("yv_chat_uso", JSON.stringify({ fecha: hoy, cantidad }));
+}
+function actualizarContadorChat() {
+  const cuotaDiv = document.getElementById("chat-cuota");
+  const input = document.getElementById("chat-input");
+  if (esPro()) {
+    cuotaDiv.innerHTML = '<span class="material-symbols-outlined">all_inclusive</span> Preguntas ilimitadas (Pro)';
+    input.disabled = false;
+    return;
+  }
+  const usadas = obtenerUsoChatHoy();
+  const restantes = Math.max(0, LIMITE_CHAT_GRATUITO - usadas);
+  cuotaDiv.innerHTML = `<span class="material-symbols-outlined">chat</span> ${restantes} de ${LIMITE_CHAT_GRATUITO} preguntas gratis hoy`;
+  input.disabled = restantes === 0;
+  if (restantes === 0) input.placeholder = "Límite diario alcanzado. Hazte Pro para preguntas ilimitadas.";
+}
+
 function agregarMensajeChat(texto, tipo) {
   const cont = document.getElementById("chat-mensajes");
   const msg = document.createElement("div");
@@ -447,9 +480,17 @@ async function enviarMensajeChat() {
   const input = document.getElementById("chat-input");
   const texto = input.value.trim();
   if (!texto) return;
+
+  if (!esPro() && obtenerUsoChatHoy() >= LIMITE_CHAT_GRATUITO) {
+    mostrarSnackbar("Alcanzaste el límite gratuito de hoy. Ve a Especialistas para conocer el plan Pro.");
+    return;
+  }
+
   agregarMensajeChat(texto, "usuario");
   input.value = "";
   agregarMensajeChat("Escribiendo...", "bot");
+  if (!esPro()) incrementarUsoChatHoy();
+  actualizarContadorChat();
 
   try {
     const respuesta = await fetch(PROXY_URL_GEMINI, {
@@ -465,9 +506,7 @@ async function enviarMensajeChat() {
   }
 }
 document.getElementById("chat-enviar").addEventListener("click", enviarMensajeChat);
-document.getElementById("chat-input").addEventListener("keydown", e => {
-  if (e.key === "Enter") enviarMensajeChat();
-});
+document.getElementById("chat-input").addEventListener("keydown", e => { if (e.key === "Enter") enviarMensajeChat(); });
 
 /* ===================== INSTALACIÓN PWA ===================== */
 let deferredPrompt;
@@ -495,3 +534,4 @@ if ("serviceWorker" in navigator) {
 cargarModelo();
 renderHistorial();
 renderCatalogo();
+actualizarUIPorNivel();
