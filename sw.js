@@ -1,11 +1,12 @@
-// Service Worker de Yachay Verde — habilita catálogo y app shell sin conexión
-const CACHE_NAME = "yachay-verde-v1";
+const CACHE_NAME = "yachay-verde-v2";
 const ARCHIVOS_A_GUARDAR = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
   "./manifest.json",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
   "./model/model.json",
   "./model/metadata.json",
   "./model/weights.bin"
