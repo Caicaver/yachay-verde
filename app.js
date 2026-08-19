@@ -1,9 +1,6 @@
 // ===== Yachay Verde — Lógica de la aplicación =====
 const URL_MODELO = "./model/";
 const UMBRAL_CONFIANZA = 0.70;
-
-// IMPORTANTE: reemplaza esta URL por la de tu propio Worker de Cloudflare (ver gemini-worker.js).
-// Nunca coloques aquí la API Key de Gemini directamente.
 const PROXY_URL_GEMINI = "https://yachay-verde-proxy.caicaver94.workers.dev";
 
 let model;
@@ -47,7 +44,6 @@ const fichas = {
   }
 };
 
-// Plantas de referencia general (no cubiertas por la IA ni por la investigación de Fase 1 del proyecto)
 const otrasPlantas = {
   "Llantén": {
     quechua: "No documentado en fuentes consultadas para este proyecto.",
@@ -69,38 +65,50 @@ const otrasPlantas = {
   }
 };
 
-/* ===================== NAVEGACIÓN ===================== */
+/* ===================== NAVEGACIÓN PRINCIPAL ===================== */
+function irATab(idTab) {
+  document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.tab === idTab));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === idTab));
+}
 document.querySelectorAll(".nav-item").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById(btn.dataset.tab).classList.add("active");
-  });
+  btn.addEventListener("click", () => irATab(btn.dataset.tab));
 });
 
-/* Drawer lateral */
+/* ===================== DRAWER Y PANELES ===================== */
 const drawer = document.getElementById("drawer");
 const overlay = document.getElementById("overlay");
-document.getElementById("btn-menu").addEventListener("click", () => {
+
+function abrirDrawer() {
   drawer.classList.add("open");
   overlay.classList.add("show");
-});
+}
+function cerrarTodo() {
+  drawer.classList.remove("open");
+  overlay.classList.remove("show");
+}
+function irAInicio() {
+  cerrarTodo();
+  document.querySelectorAll(".modal.panel-lateral").forEach(p => p.hidden = true);
+  irATab("tab-identificar");
+}
+
+document.getElementById("btn-menu").addEventListener("click", abrirDrawer);
+document.getElementById("btn-logo-inicio").addEventListener("click", irAInicio);
 overlay.addEventListener("click", cerrarTodo);
 
 document.querySelectorAll(".drawer-item").forEach(item => {
   item.addEventListener("click", () => {
     cerrarTodo();
-    document.getElementById(item.dataset.panel).hidden = false;
+    if (item.dataset.accion === "inicio") {
+      irAInicio();
+    } else if (item.dataset.panel) {
+      document.getElementById(item.dataset.panel).hidden = false;
+    }
   });
 });
 document.querySelectorAll(".btn-cerrar-panel").forEach(btn => {
   btn.addEventListener("click", e => e.target.closest(".modal").hidden = true);
 });
-function cerrarTodo() {
-  drawer.classList.remove("open");
-  overlay.classList.remove("show");
-}
 
 /* ===================== SNACKBAR ===================== */
 function mostrarSnackbar(mensaje) {
@@ -139,6 +147,14 @@ document.getElementById("btn-fuente-menos").addEventListener("click", () => {
   aplicarFuente(escalaFuente);
 });
 
+/* ===================== ACORDEONES GENÉRICOS (fuentes y catálogo) ===================== */
+function activarAcordeon(contenedor) {
+  contenedor.querySelectorAll(".catalogo-item-header").forEach(header => {
+    header.addEventListener("click", () => header.closest(".catalogo-item").classList.toggle("open"));
+  });
+}
+activarAcordeon(document.getElementById("panel-fuentes"));
+
 /* ===================== CARGAR MODELO ===================== */
 async function cargarModelo() {
   const estado = document.getElementById("estado-modelo");
@@ -169,7 +185,7 @@ function construirFichaHTML(nombre, info) {
   `;
 }
 
-/* ===================== PREDICCIÓN (con múltiples resultados) ===================== */
+/* ===================== PREDICCIÓN ===================== */
 async function predecir(imagenElemento) {
   if (!model) { mostrarSnackbar("El modelo aún no está listo."); return; }
   const prediccion = await model.predict(imagenElemento);
@@ -316,7 +332,7 @@ document.getElementById("btn-borrar-historial").addEventListener("click", () => 
   mostrarSnackbar("Historial borrado");
 });
 
-/* ===================== CATÁLOGO (validadas / otras) ===================== */
+/* ===================== CATÁLOGO ===================== */
 let conjuntoActivo = "validadas";
 document.querySelectorAll(".segmented-btn").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -356,7 +372,7 @@ function renderCatalogo(filtro = "") {
 }
 document.getElementById("buscador-catalogo").addEventListener("input", e => renderCatalogo(e.target.value));
 
-/* ===================== ESCUCHAR Y COMPARTIR (delegación) ===================== */
+/* ===================== ESCUCHAR Y COMPARTIR ===================== */
 document.addEventListener("click", e => {
   if (e.target.closest(".btn-escuchar")) {
     const nombre = e.target.closest(".btn-escuchar").dataset.planta;
@@ -416,8 +432,6 @@ document.getElementById("btn-guardar-perfil").addEventListener("click", () => {
     document.getElementById("perfil-zona").value = perfil.zona || "";
   }
 })();
-// Reemplaza este enlace por el de tu propio Google Form de feedback.
-document.getElementById("link-google-form").href = "https://forms.google.com/";
 
 /* ===================== ASISTENTE GEMINI (vía proxy seguro) ===================== */
 function agregarMensajeChat(texto, tipo) {
@@ -447,7 +461,7 @@ async function enviarMensajeChat() {
     document.querySelector(".chat-msg.bot:last-child").textContent = data.respuesta;
   } catch (err) {
     document.querySelector(".chat-msg.bot:last-child").textContent =
-      "No se pudo conectar con el asistente. Verifica que el proxy de Gemini esté configurado (PROXY_URL_GEMINI en app.js).";
+      "No se pudo conectar con el asistente. Verifica tu conexión a internet e inténtalo de nuevo.";
   }
 }
 document.getElementById("chat-enviar").addEventListener("click", enviarMensajeChat);

@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#386A20">
 <title>Yachay Verde — Guía de Plantas Medicinales</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
@@ -18,8 +20,10 @@
   <button id="btn-menu" class="icon-button" aria-label="Abrir menú">
     <span class="material-symbols-outlined">menu</span>
   </button>
-  <span class="material-symbols-outlined logo-icon">eco</span>
-  <h1>Yachay Verde</h1>
+  <button id="btn-logo-inicio" class="logo-clickable" aria-label="Ir al inicio">
+    <img src="icons/icon-192.png" alt="Logo Yachay Verde" class="logo-icon-img">
+    <h1>Yachay Verde</h1>
+  </button>
   <button id="btn-tema" class="icon-button" aria-label="Cambiar tema claro/oscuro">
     <span class="material-symbols-outlined">dark_mode</span>
   </button>
@@ -32,13 +36,24 @@
 <div id="overlay" class="overlay"></div>
 <nav id="drawer" class="drawer">
   <div class="drawer-header">
-    <span class="material-symbols-outlined logo-icon">eco</span>
+    <img src="icons/icon-192.png" alt="Logo Yachay Verde" class="drawer-logo">
     <strong>Yachay Verde</strong>
   </div>
+
+  <span class="drawer-grupo-titulo">Principal</span>
+  <button class="drawer-item" data-accion="inicio"><span class="material-symbols-outlined">home</span> Inicio</button>
+
+  <span class="drawer-grupo-titulo">Información</span>
   <button class="drawer-item" data-panel="panel-fuentes"><span class="material-symbols-outlined">verified</span> Información y fuentes</button>
+
+  <span class="drawer-grupo-titulo">Comunidad</span>
   <button class="drawer-item" data-panel="panel-especialistas"><span class="material-symbols-outlined">stethoscope</span> Especialistas de salud</button>
   <button class="drawer-item" data-panel="panel-perfil"><span class="material-symbols-outlined">badge</span> Mi perfil</button>
+
+  <span class="drawer-grupo-titulo">Preferencias</span>
   <button class="drawer-item" data-panel="panel-ajustes"><span class="material-symbols-outlined">tune</span> Ajustes</button>
+
+  <span class="drawer-grupo-titulo">Proyecto</span>
   <button class="drawer-item" data-panel="panel-nosotros"><span class="material-symbols-outlined">groups</span> Nosotros</button>
 </nav>
 
@@ -97,10 +112,10 @@
 
     <div id="ficha" class="card ficha-card" hidden></div>
 
+    <div class="seccion-titulo">Historial reciente</div>
     <div id="historial-section" class="historial-section">
       <div class="historial-header">
-        <h3>Historial reciente</h3>
-        <button id="btn-borrar-historial" class="btn-text">Borrar</button>
+        <button id="btn-borrar-historial" class="btn-text">Borrar historial</button>
       </div>
       <div id="historial-chips" class="historial-chips"></div>
       <p class="historial-nota">El historial se guarda solo en este dispositivo; no se envía ni almacena ningún dato personal.</p>
@@ -177,36 +192,42 @@
   </div>
 </div>
 
-<!-- ===== Panel: Información y fuentes ===== -->
+<!-- ===== Panel: Información y fuentes (acordeón) ===== -->
 <div id="panel-fuentes" class="modal panel-lateral" hidden>
   <div class="panel-header">
     <h2>Información y fuentes verificadas</h2>
     <button class="btn-cerrar-panel"><span class="material-symbols-outlined">close</span></button>
   </div>
   <div class="panel-body">
-    <div class="card">
-      <h3>¿Cómo se validó esta información?</h3>
-      <p>Los datos de cada planta provienen de una <strong>revisión documental jerarquizada</strong>: se priorizaron estudios hechos en La Libertad y zonas andinas cercanas, complementados con fuentes nacionales e internacionales cuando fue necesario. Cada dato final fue contrastado en al menos dos fuentes independientes.</p>
+    <div class="catalogo-item">
+      <div class="catalogo-item-header"><h3>¿Cómo se validó esta información?</h3><span class="material-symbols-outlined expand-icon">expand_more</span></div>
+      <div class="catalogo-item-body">
+        <p>Los datos de cada planta provienen de una <strong>revisión documental jerarquizada</strong>: se priorizaron estudios hechos en La Libertad y zonas andinas cercanas, complementados con fuentes nacionales e internacionales cuando fue necesario. Cada dato final fue contrastado en al menos dos fuentes independientes.</p>
+      </div>
     </div>
-    <div class="card">
-      <h3>Sobre los resultados de la identificación</h3>
-      <p>El modelo de inteligencia artificial reconoce patrones visuales (forma de la hoja, color, flor) y puede equivocarse, especialmente entre especies de aspecto similar o con fotos de baja calidad. Un resultado con menos de 70% de confianza se marca como "no seguro" y no debe tomarse como identificación definitiva.</p>
+    <div class="catalogo-item">
+      <div class="catalogo-item-header"><h3>Sobre los resultados de la identificación</h3><span class="material-symbols-outlined expand-icon">expand_more</span></div>
+      <div class="catalogo-item-body">
+        <p>El modelo de inteligencia artificial reconoce patrones visuales (forma de la hoja, color, flor) y puede equivocarse, especialmente entre especies de aspecto similar o con fotos de baja calidad. Un resultado con menos de 70% de confianza se marca como "no seguro" y no debe tomarse como identificación definitiva.</p>
+      </div>
     </div>
-    <div class="card">
-      <h3>Referencias bibliográficas completas</h3>
-      <ul class="lista-referencias">
-        <li>Ascate-Pasos, M. E., Ganoza-Yupanqui, M. L., Suárez-Rebaza, L. A., y Bussmann, R. W. (2020). <em>Valeriana pilosa</em> Ruiz & Pav.: Una revisión de usos tradicionales, fitoquímica y farmacología. <em>Ethnobotany Research and Applications, 20</em>, 1–15.</li>
-        <li>Bocanegra, L., Bocanegra, F., y Mostacero, J. (2011). Efectividad de la medicina herbolaria y su impacto en la calidad de vida de los pobladores de Curgos, Perú. <em>UCV-Scientia, 3</em>(1), 23–34.</li>
-        <li>Bussmann, R. W., y Sharon, D. (2006). Traditional medicinal plant use in Northern Peru. <em>Journal of Ethnobiology and Ethnomedicine, 2</em>, 47.</li>
-        <li>Callohuari, R., Sandoval, M., y Huamán, O. (2017). Efecto gastroprotector y capacidad antioxidante del extracto acuoso de las vainas de <em>Caesalpinia spinosa</em> "tara". <em>Anales de la Facultad de Medicina, 78</em>(1).</li>
-        <li>Cuadros Oriundo, E., y Guevara Pérez, R. E. (2023). <em>Uso tradicional del Gentianella alborosea (Hercampuri)...</em> [Tesis, Universidad Privada Norbert Wiener].</li>
-        <li>Grupo Técnico Nacional Plantas Medicinales. (2006). <em>Ficha técnica: Hercampuri</em>. PromPerú.</li>
-        <li>León-Marrou, M. E., Pagador, S., Yupari-Azabache, I., y Díaz-Ortega, J. L. (2023). Actividad antifúngica in vitro de aceites esenciales de muña. <em>Interciencia, 48</em>(6), 294–300.</li>
-        <li>Linares Otoya, V. (2020). Considerations for the use and study of the Peruvian "muña". <em>Ethnobotany Research and Applications, 19</em>, 1–9.</li>
-        <li>López S., A., Oré S., R., y Miranda V., C. (2020). <em>Caesalpinia spinosa</em>: Efecto protector frente a radiación UV. <em>Rebiol, 40</em>(1).</li>
-        <li>Muñoz-Guerra, K. M., et al. (2025). Etnobotánica de las plantas medicinales de Guadalupe, La Libertad. <em>BLACPMA, 24</em>(6), 960–986.</li>
-        <li>PromPerú. (s. f.). <em>Monografía: Tara, Caesalpinia spinosa</em>.</li>
-      </ul>
+    <div class="catalogo-item">
+      <div class="catalogo-item-header"><h3>Referencias bibliográficas completas</h3><span class="material-symbols-outlined expand-icon">expand_more</span></div>
+      <div class="catalogo-item-body">
+        <ul class="lista-referencias">
+          <li>Ascate-Pasos, M. E., Ganoza-Yupanqui, M. L., Suárez-Rebaza, L. A., y Bussmann, R. W. (2020). <em>Valeriana pilosa</em> Ruiz & Pav.: Una revisión de usos tradicionales, fitoquímica y farmacología. <em>Ethnobotany Research and Applications, 20</em>, 1–15.</li>
+          <li>Bocanegra, L., Bocanegra, F., y Mostacero, J. (2011). Efectividad de la medicina herbolaria y su impacto en la calidad de vida de los pobladores de Curgos, Perú. <em>UCV-Scientia, 3</em>(1), 23–34.</li>
+          <li>Bussmann, R. W., y Sharon, D. (2006). Traditional medicinal plant use in Northern Peru. <em>Journal of Ethnobiology and Ethnomedicine, 2</em>, 47.</li>
+          <li>Callohuari, R., Sandoval, M., y Huamán, O. (2017). Efecto gastroprotector y capacidad antioxidante del extracto acuoso de las vainas de <em>Caesalpinia spinosa</em> "tara". <em>Anales de la Facultad de Medicina, 78</em>(1).</li>
+          <li>Cuadros Oriundo, E., y Guevara Pérez, R. E. (2023). <em>Uso tradicional del Gentianella alborosea (Hercampuri)...</em> [Tesis, Universidad Privada Norbert Wiener].</li>
+          <li>Grupo Técnico Nacional Plantas Medicinales. (2006). <em>Ficha técnica: Hercampuri</em>. PromPerú.</li>
+          <li>León-Marrou, M. E., Pagador, S., Yupari-Azabache, I., y Díaz-Ortega, J. L. (2023). Actividad antifúngica in vitro de aceites esenciales de muña. <em>Interciencia, 48</em>(6), 294–300.</li>
+          <li>Linares Otoya, V. (2020). Considerations for the use and study of the Peruvian "muña". <em>Ethnobotany Research and Applications, 19</em>, 1–9.</li>
+          <li>López S., A., Oré S., R., y Miranda V., C. (2020). <em>Caesalpinia spinosa</em>: Efecto protector frente a radiación UV. <em>Rebiol, 40</em>(1).</li>
+          <li>Muñoz-Guerra, K. M., et al. (2025). Etnobotánica de las plantas medicinales de Guadalupe, La Libertad. <em>BLACPMA, 24</em>(6), 960–986.</li>
+          <li>PromPerú. (s. f.). <em>Monografía: Tara, Caesalpinia spinosa</em>.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
@@ -269,13 +290,6 @@
       <button id="btn-guardar-perfil" class="btn-filled">Guardar</button>
       <p id="perfil-guardado-nota" class="nota-demo" hidden>Perfil guardado localmente ✓</p>
     </div>
-    <div class="card">
-      <h3>Reporte agregado (opcional)</h3>
-      <p>Si deseas contribuir con estadísticas anónimas para el equipo del proyecto, puedes llenar este formulario voluntario de Google Forms (no incluye datos personales identificables):</p>
-      <a href="#" id="link-google-form" class="btn-tonal-lg" target="_blank" rel="noopener">
-        <span class="material-symbols-outlined">assignment</span> Abrir formulario de feedback
-      </a>
-    </div>
   </div>
 </div>
 
@@ -310,6 +324,7 @@
     <button class="btn-cerrar-panel"><span class="material-symbols-outlined">close</span></button>
   </div>
   <div class="panel-body">
+    <img src="assets/logo-completo.png" alt="Yachay Verde" class="hero-imagen">
     <div class="card">
       <h3>Sobre Yachay Verde</h3>
       <p>Yachay Verde es una guía digital que identifica plantas medicinales de la sierra liberteña (muña, valeriana, hercampuri y tara) mediante un modelo de inteligencia artificial entrenado en Teachable Machine, con información revisada de fuentes científicas y etnobotánicas.</p>

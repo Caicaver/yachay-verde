@@ -1,4 +1,4 @@
-const CACHE_NAME = "yachay-verde-v2";
+const CACHE_NAME = "yachay-verde-v3";
 const ARCHIVOS_A_GUARDAR = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const ARCHIVOS_A_GUARDAR = [
   "./manifest.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./assets/logo-completo.png",
   "./model/model.json",
   "./model/metadata.json",
   "./model/weights.bin"
@@ -14,7 +15,9 @@ const ARCHIVOS_A_GUARDAR = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ARCHIVOS_A_GUARDAR))
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(ARCHIVOS_A_GUARDAR.map(url => cache.add(url)))
+    )
   );
   self.skipWaiting();
 });
