@@ -232,6 +232,7 @@ main { max-width: 520px; margin: 0 auto; padding: 16px; }
 
 /* ===== Modal genérico y cámara ===== */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 70; display: flex; align-items: center; justify-content: center; }
+.modal[hidden] { display: none; }
 .modal-contenido { background: var(--md-surface); border-radius: var(--shape-large); overflow: hidden; max-width: 92%; }
 .modal-camara-contenido { position: relative; width: 100%; max-width: 480px; }
 #video-camara { width: 100%; display: block; background: #000; max-height: 70vh; }
